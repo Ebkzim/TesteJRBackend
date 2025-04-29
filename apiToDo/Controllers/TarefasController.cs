@@ -1,28 +1,28 @@
-﻿using apiToDo.DTO;
+﻿
+using apiToDo.DTO;
 using apiToDo.Models;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System;
 
 namespace apiToDo.Controllers
 {
     [ApiController]
-    [Route("[controller]")]
+    [Route("api/[controller]")]
     public class TarefasController : ControllerBase
     {
-        [Authorize]
-        [HttpPost("lstTarefas")]
+        private readonly Tarefas _tarefas = new Tarefas();
+
+        [HttpGet("lstTarefas")]
         public ActionResult lstTarefas()
         {
             try
             {
-              
-                return StatusCode(200);
+                var resultado = _tarefas.lstTarefas();
+                return Ok(resultado);
             }
-
             catch (Exception ex)
             {
-                return StatusCode(400, new { msg = $"Ocorreu um erro em sua API {ex.Message}"});
+                return BadRequest(new { msg = $"Erro ao listar tarefas: {ex.Message}" });
             }
         }
 
@@ -31,30 +31,54 @@ namespace apiToDo.Controllers
         {
             try
             {
-
-                return StatusCode(200);
-
-
+                var resultado = _tarefas.InserirTarefa(Request);
+                return Ok(resultado);
             }
-
             catch (Exception ex)
             {
-                return StatusCode(400, new { msg = $"Ocorreu um erro em sua API {ex.Message}" });
+                return BadRequest(new { msg = $"Erro ao inserir tarefa: {ex.Message}" });
             }
         }
 
-        [HttpGet("DeletarTarefa")]
-        public ActionResult DeleteTask([FromQuery] int ID_TAREFA)
+        [HttpDelete("DeleteTask/{id}")]
+        public ActionResult DeleteTask(int id)
         {
             try
             {
-
-                return StatusCode(200);
+                var resultado = _tarefas.DeletarTarefa(id);
+                return Ok(resultado);
             }
-
             catch (Exception ex)
             {
-                return StatusCode(400, new { msg = $"Ocorreu um erro em sua API {ex.Message}" });
+                return NotFound(new { msg = ex.Message });
+            }
+        }
+
+        [HttpPut("AtualizarTarefa")]
+        public ActionResult AtualizarTarefa([FromBody] TarefaDTO tarefa)
+        {
+            try
+            {
+                var resultado = _tarefas.AtualizarTarefa(tarefa);
+                return Ok(resultado);
+            }
+            catch (Exception ex)
+            {
+                return NotFound(new { msg = ex.Message });
+            }
+        }
+
+        [HttpGet("ObterTarefa/{id}")]
+        public ActionResult ObterTarefa(int id)
+        {
+            try
+            {
+                var resultado = _tarefas.ObterTarefa(id);
+                return Ok(resultado);
+            }
+            catch (Exception ex)
+            {
+                return NotFound(new { msg = ex.Message });
             }
         }
     }
